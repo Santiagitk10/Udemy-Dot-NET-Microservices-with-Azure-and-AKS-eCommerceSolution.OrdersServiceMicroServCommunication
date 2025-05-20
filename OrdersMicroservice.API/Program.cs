@@ -20,25 +20,27 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Cors
-builder.Services.AddCors(options => {
-  options.AddDefaultPolicy(builder =>
-  {
-    builder.WithOrigins("http://localhost:4200")
-    .AllowAnyMethod()
-    .AllowAnyHeader();
-  });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")
+      .AllowAnyMethod()
+      .AllowAnyHeader();
+    });
 });
 
-
-builder.Services.AddHttpClient<UsersMicroserviceClient>(client => {
-  client.BaseAddress = new Uri($"http://{builder.Configuration["UsersMicroserviceName"]}:{builder.Configuration["UsersMicroservicePort"]}");
+//Se usa una clase de http client customizada para poder tener configuración diferente. Por ejemplo,una url diferente para cada microservicio
+//la uri se arma usando variables de entorno a través de builder.Configuration que luego se pueden proveer por docker por ejemplo
+builder.Services.AddHttpClient<UsersMicroserviceClient>(client =>
+{
+    client.BaseAddress = new Uri($"http://{builder.Configuration["UsersMicroserviceName"]}:{builder.Configuration["UsersMicroservicePort"]}");
 });
 
-builder.Services.AddHttpClient<ProductsMicroserviceClient>(client => {
-  client.BaseAddress = new Uri($"http://{builder.Configuration["ProductsMicroserviceName"]}:{builder.Configuration["ProductsMicroservicePort"]}");
+builder.Services.AddHttpClient<ProductsMicroserviceClient>(client =>
+{
+    client.BaseAddress = new Uri($"http://{builder.Configuration["ProductsMicroserviceName"]}:{builder.Configuration["ProductsMicroservicePort"]}");
 });
-
-
 
 var app = builder.Build();
 
@@ -59,6 +61,5 @@ app.UseAuthorization();
 
 //Endpoints
 app.MapControllers();
-
 
 app.Run();
